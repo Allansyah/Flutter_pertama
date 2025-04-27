@@ -34,6 +34,11 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final TextEditingController _tahunPembelianController =
+      TextEditingController();
+  final TextEditingController _tanggalPembelianController =
+      TextEditingController();
+
   File? _image;
   final List<String> kategoriList = ["selection"];
   String? selectedKategori = "selection";
@@ -128,32 +133,82 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
 
             SizedBox(height: 14),
-            // Dropdown Kategori
-            DropdownButtonFormField<String>(
-              decoration: InputDecoration(
-                icon: Icon(
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(
                   Icons.category_rounded,
-                ), // <-- ini yang benar supaya di luar kotak
-                labelText: "Category",
-                hintText: "Category Name",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(17),
+                  size: 24,
+                  color: Colors.grey.shade600,
                 ),
-              ),
-              value: selectedKategori,
-              onChanged: (value) {
-                setState(() {
-                  selectedKategori = value;
-                });
-              },
-              borderRadius: BorderRadius.circular(17),
-              items:
-                  kategoriList.map((kategori) {
-                    return DropdownMenuItem<String>(
-                      value: kategori,
-                      child: Text(kategori),
-                    );
-                  }).toList(),
+                SizedBox(width: 16),
+                Expanded(
+                  child: Container(
+                    padding: EdgeInsets.zero,
+                    child: Stack(
+                      children: [
+                        // Field utama
+                        DropdownButtonFormField<String>(
+                          decoration: InputDecoration(
+                            labelText: "Category",
+                            hintText: "Category Name",
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(17),
+                            ),
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 12,
+                            ),
+                          ),
+                          value: selectedKategori,
+                          onChanged: (value) {
+                            setState(() {
+                              selectedKategori = value;
+                            });
+                          },
+                          // Konfigurasi style dropdown
+                          icon: Icon(Icons.arrow_drop_down, size: 23),
+                          iconSize: 32,
+                          elevation: 16,
+                          style: TextStyle(color: Colors.black, fontSize: 16),
+                          dropdownColor: Colors.white,
+                          menuMaxHeight: 500,
+                          isExpanded: true,
+
+                          // Kustomisasi item dropdown
+                          selectedItemBuilder: (BuildContext context) {
+                            return kategoriList.map<Widget>((String item) {
+                              return Container(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  item,
+                                  style: TextStyle(
+                                    color: Colors.black87,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              );
+                            }).toList();
+                          },
+                          items:
+                              kategoriList.map((kategori) {
+                                return DropdownMenuItem<String>(
+                                  value: kategori,
+                                  child: Container(
+                                    width: double.infinity,
+                                    child: Text(
+                                      kategori,
+                                      style: TextStyle(fontSize: 15),
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
 
             SizedBox(height: 14),
@@ -250,16 +305,33 @@ class _MyHomePageState extends State<MyHomePage> {
             // ),
             SizedBox(height: 14),
             TextFormField(
-              keyboardType: TextInputType.number,
+              controller: _tanggalPembelianController,
+              readOnly: true, // User tidak bisa ketik manual
               decoration: InputDecoration(
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(17),
                 ),
-                hintText: "Tahun Pembelian",
-                labelText: "Tahun Pembelian",
+                hintText: "Tanggal Pembelian",
+                labelText: "Tanggal Pembelian",
                 icon: Icon(Icons.event),
               ),
+              onTap: () async {
+                DateTime? pickedDate = await showDatePicker(
+                  context: context,
+                  initialDate: DateTime.now(),
+                  firstDate: DateTime(1900),
+                  lastDate: DateTime(2100),
+                );
+
+                if (pickedDate != null) {
+                  setState(() {
+                    _tanggalPembelianController.text =
+                        "${pickedDate.day.toString().padLeft(2, '0')}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.year}";
+                  });
+                }
+              },
             ),
+
             SizedBox(height: 14),
             TextFormField(
               keyboardType: TextInputType.number,
